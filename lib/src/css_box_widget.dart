@@ -24,7 +24,8 @@ class CssBoxWidget extends StatelessWidget {
     this.childIsReplaced = false,
     this.shrinkWrap = false,
     this.top = false,
-  }) : child = _generateWidgetChild(children, style);
+    EditableTextContextMenuBuilder? contextMenuBuilder,
+  }) : child = _generateWidgetChild(children, style, contextMenuBuilder);
 
   /// The child to be rendered within the CSS Box.
   final Widget child;
@@ -81,9 +82,9 @@ class CssBoxWidget extends StatelessWidget {
           child: top
               ? child
               : MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                  child: child,
-                ),
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: child,
+          ),
         ),
         if (markerBox != null) Text.rich(markerBox),
       ],
@@ -92,7 +93,8 @@ class CssBoxWidget extends StatelessWidget {
 
   /// Takes a list of InlineSpan children and generates a Text.rich Widget
   /// containing those children.
-  static Widget _generateWidgetChild(List<InlineSpan> children, Style style) {
+  static Widget _generateWidgetChild(List<InlineSpan> children, Style style,
+      EditableTextContextMenuBuilder? contextMenuBuilder,) {
     if (children.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -106,7 +108,7 @@ class CssBoxWidget extends StatelessWidget {
       }
     }
 
-    return Text.rich(
+    return SelectableText.rich(
       TextSpan(
         style: style.generateTextStyle(),
         children: children,
@@ -114,7 +116,7 @@ class CssBoxWidget extends StatelessWidget {
       textAlign: style.textAlign ?? TextAlign.start,
       textDirection: style.direction,
       maxLines: style.maxLines,
-      overflow: style.textOverflow ?? TextOverflow.clip,
+      contextMenuBuilder: contextMenuBuilder,
     );
   }
 
@@ -160,7 +162,7 @@ class CssBoxWidget extends StatelessWidget {
   /// determine the content-box's width.
   bool _shouldExpandToFillBlock() {
     return (style.display == Display.block ||
-            style.display == Display.listItem) &&
+        style.display == Display.listItem) &&
         !childIsReplaced &&
         !shrinkWrap;
   }
@@ -179,8 +181,7 @@ class CssBoxWidget extends StatelessWidget {
 }
 
 class _CSSBoxRenderer extends MultiChildRenderObjectWidget {
-  _CSSBoxRenderer({
-    Key? key,
+  const _CSSBoxRenderer({
     required super.children,
     required this.display,
     required this.margins,
@@ -192,7 +193,7 @@ class _CSSBoxRenderer extends MultiChildRenderObjectWidget {
     required this.childIsReplaced,
     required this.emValue,
     required this.shrinkWrap,
-  }) : super(key: key);
+  });
 
   /// The Display type of the element
   final Display display;
@@ -311,7 +312,7 @@ class _CSSBoxRenderer extends MultiChildRenderObjectWidget {
 
 @visibleForTesting
 
-/// Implements the CSS layout algorithm
+
 class RenderCSSBox extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, CSSBoxParentData>,
@@ -326,7 +327,8 @@ class RenderCSSBox extends RenderBox
     required TextDirection textDirection,
     required bool childIsReplaced,
     required bool shrinkWrap,
-  })  : _display = display,
+  })
+      : _display = display,
         _width = width,
         _height = height,
         _margins = margins,
@@ -430,7 +432,7 @@ class RenderCSSBox extends RenderBox
     RenderBox? child = firstChild;
     while (child != null) {
       final CSSBoxParentData childParentData =
-          child.parentData! as CSSBoxParentData;
+      child.parentData! as CSSBoxParentData;
       extent = math.max(extent, mainChildSizeGetter(child));
       assert(child.parentData == childParentData);
       child = childParentData.nextSibling;
@@ -492,18 +494,18 @@ class RenderCSSBox extends RenderBox
     final CSSBoxParentData parentData = child.parentData! as CSSBoxParentData;
     RenderBox? markerBoxChild = parentData.nextSibling;
 
-    // Calculate child size
+// Calculate child size
     final childConstraints = constraints.copyWith(
       maxWidth: (this.width.unit != Unit.auto)
           ? this.width.value
           : containingBlockSize.width -
-              (margins.left?.value ?? 0) -
-              (margins.right?.value ?? 0),
+          (margins.left?.value ?? 0) -
+          (margins.right?.value ?? 0),
       maxHeight: (this.height.unit != Unit.auto)
           ? this.height.value
           : containingBlockSize.height -
-              (margins.top?.value ?? 0) -
-              (margins.bottom?.value ?? 0),
+          (margins.top?.value ?? 0) -
+          (margins.bottom?.value ?? 0),
       minWidth: (this.width.unit != Unit.auto) ? this.width.value : 0,
       minHeight: (this.height.unit != Unit.auto) ? this.height.value : 0,
     );
@@ -512,14 +514,14 @@ class RenderCSSBox extends RenderBox
       layoutChild(markerBoxChild, childConstraints);
     }
 
-    // Calculate used values of margins based on rules
+// Calculate used values of margins based on rules
     final usedMargins = _calculateUsedMargins(childSize, containingBlockSize);
     final horizontalMargins =
         (usedMargins.left?.value ?? 0) + (usedMargins.right?.value ?? 0);
     final verticalMargins =
         (usedMargins.top?.value ?? 0) + (usedMargins.bottom?.value ?? 0);
 
-    //Calculate Width and Height of CSS Box
+//Calculate Width and Height of CSS Box
     height = childSize.height;
     switch (display) {
       case Display.block:
@@ -565,11 +567,11 @@ class RenderCSSBox extends RenderBox
     RenderBox child = firstChild!;
 
     final CSSBoxParentData childParentData =
-        child.parentData! as CSSBoxParentData;
+    child.parentData! as CSSBoxParentData;
 
-    // Calculate used margins based on constraints and child size
+// Calculate used margins based on constraints and child size
     final usedMargins =
-        _calculateUsedMargins(sizes.childSize, constraints.biggest);
+    _calculateUsedMargins(sizes.childSize, constraints.biggest);
     final leftMargin = usedMargins.left?.value ?? 0;
     final topMargin = usedMargins.top?.value ?? 0;
 

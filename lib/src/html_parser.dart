@@ -41,6 +41,7 @@ class HtmlParser extends StatefulWidget {
   final Set<String>? onlyRenderTheseTags;
   final OnTap? internalOnAnchorTap;
   final Html? root;
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
 
   HtmlParser({
     required super.key,
@@ -53,6 +54,7 @@ class HtmlParser extends StatefulWidget {
     required this.extensions,
     required this.doNotRenderTheseTags,
     required this.onlyRenderTheseTags,
+    this.contextMenuBuilder,
     this.root,
   }) : internalOnAnchorTap = onAnchorTap ??
             (key != null ? _handleAnchorTap(key, onLinkTap) : onLinkTap);
@@ -174,13 +176,12 @@ class _HtmlParserState extends State<HtmlParser> {
   /// which are then parsed into an [InlineSpan] tree that is then rendered to the screen by Flutter
   @override
   Widget build(BuildContext context) {
-    //Rendering Step
     return CssBoxWidget.withInlineSpanChildren(
       style: tree.style,
-      //TODO can we have buildTree return a list of InlineSpans rather than a single one.
       children: [buildTree()],
       shrinkWrap: widget.shrinkWrap,
       top: true,
+      contextMenuBuilder: widget.contextMenuBuilder,
     );
   }
 

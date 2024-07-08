@@ -62,6 +62,7 @@ class Html extends StatefulWidget {
     this.onlyRenderTheseTags,
     this.doNotRenderTheseTags,
     this.style = const {},
+    this.contextMenuBuilder,
   })  : documentElement = null,
         assert(data != null),
         _anchorKey = anchorKey ?? GlobalKey();
@@ -78,6 +79,7 @@ class Html extends StatefulWidget {
     this.doNotRenderTheseTags,
     this.onlyRenderTheseTags,
     this.style = const {},
+    this.contextMenuBuilder,
   })  : data = null,
         assert(document != null),
         documentElement = document!.documentElement,
@@ -95,6 +97,7 @@ class Html extends StatefulWidget {
     this.doNotRenderTheseTags,
     this.onlyRenderTheseTags,
     this.style = const {},
+    this.contextMenuBuilder,
   })  : data = null,
         assert(documentElement != null),
         _anchorKey = anchorKey ?? GlobalKey();
@@ -139,6 +142,8 @@ class Html extends StatefulWidget {
   /// An API that allows you to override the default style for any HTML element
   final Map<String, Style> style;
 
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
+
   @override
   State<StatefulWidget> createState() => _HtmlState();
 }
@@ -178,6 +183,7 @@ class _HtmlState extends State<Html> {
       extensions: widget.extensions,
       doNotRenderTheseTags: widget.doNotRenderTheseTags,
       onlyRenderTheseTags: widget.onlyRenderTheseTags,
+      contextMenuBuilder: widget.contextMenuBuilder,
     );
   }
 }
